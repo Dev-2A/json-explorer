@@ -1,5 +1,6 @@
 import InputPanel from "./components/InputPanel";
 import ErrorBanner from "./components/ErrorBanner";
+import TreeView from "./components/TreeView";
 import { useJsonParser } from "./hooks/useJsonParser";
 
 function App() {
@@ -32,19 +33,10 @@ function App() {
           <InputPanel onParse={parse} />
         </div>
 
-        {/* 우측: 트리 뷰 (Step 5) */}
+        {/* 우측: 트리 뷰 */}
         <div className="w-1/2 p-4 flex flex-col">
           {parsedData ? (
-            <div className="text-sm text-slate-400">
-              <p className="mb-2 font-semibold text-slate-300">🌳 Tree View</p>
-              <pre className="text-xs text-slate-500 overflow-auto custom-scrollbar">
-                {JSON.stringify(parsedData, null, 2).slice(0, 500)}
-                {JSON.stringify(parsedData, null, 2).length > 500 && "\n..."}
-              </pre>
-              <p className="mt-3 text-slate-600 text-xs">
-                (Step 5에서 트리 컴포넌트로 교체 예정)
-              </p>
-            </div>
+            <TreeView data={parsedData} />
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <p className="text-slate-600 text-sm text-center leading-relaxed">
