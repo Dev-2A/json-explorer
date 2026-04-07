@@ -1,14 +1,10 @@
 import { useState, useCallback, useMemo } from "react";
 import { isExpandable } from "../utils/typeUtils";
 
-/**
- * 트리 전체의 펼침/접기 상태를 관리하는 훅
- */
 export function useExpandState(data) {
   const [expandMap, setExpandMap] = useState({});
   const [lastData, setLastData] = useState(null);
 
-  // 데이터가 바뀌면 기본 상태 생성 (깊이 2까지 자동 펼침)
   useMemo(() => {
     if (data === lastData) return;
     setLastData(data);
@@ -84,6 +80,19 @@ export function useExpandState(data) {
     [data],
   );
 
+  // 검색 시 자동 펼침 경로 적용
+  const applyAutoExpand = useCallback((autoExpandPaths) => {
+    if (!autoExpandPaths || autoExpandPaths.size === 0) return;
+
+    setExpandMap((prev) => {
+      const next = { ...prev };
+      autoExpandPaths.forEach((path) => {
+        if (path in next) next[path] = true;
+      });
+      return next;
+    });
+  }, []);
+
   const isExpanded = useCallback(
     (path) => {
       return expandMap[path] ?? false;
@@ -91,5 +100,12 @@ export function useExpandState(data) {
     [expandMap],
   );
 
-  return { isExpanded, toggle, expandAll, collapseAll, expandToDepth };
+  return {
+    isExpanded,
+    toggle,
+    expandAll,
+    collapseAll,
+    expandToDepth,
+    applyAutoExpand,
+  };
 }

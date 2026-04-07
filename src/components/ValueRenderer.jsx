@@ -1,6 +1,7 @@
 import { getValueType, getTypeColorClass } from "../utils/typeUtils";
+import HighlightText from "./HighlightText";
 
-export default function ValueRenderer({ value }) {
+export default function ValueRenderer({ value, searchQuery = "" }) {
   const type = getValueType(value);
   const colorClass = getTypeColorClass(type);
 
@@ -8,13 +9,21 @@ export default function ValueRenderer({ value }) {
     case "string":
       return (
         <span className={colorClass}>
-          "<span className="select-all">{value}</span>"
+          "<HighlightText text={value} query={searchQuery} />"
         </span>
       );
     case "number":
-      return <span className={colorClass}>{value}</span>;
+      return (
+        <span className={colorClass}>
+          <HighlightText text={String(value)} query={searchQuery} />
+        </span>
+      );
     case "boolean":
-      return <span className={colorClass}>{value ? "true" : "false"}</span>;
+      return (
+        <span className={colorClass}>
+          <HighlightText text={value ? "true" : "false"} query={searchQuery} />
+        </span>
+      );
     case "null":
       return <span className={`${colorClass} italic`}>null</span>;
     default:

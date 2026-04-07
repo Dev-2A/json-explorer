@@ -1,12 +1,36 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import TreeNode from "./TreeNode";
 import PathBar from "./PathBar";
+import SearchBar from "./SearchBar";
 import { useExpandState } from "../hooks/useExpandState";
+import { useSearch } from "../hooks/useSearch";
 
 export default function TreeView({ data, onToast }) {
-  const { isExpanded, toggle, expandAll, collapseAll, expandToDepth } =
-    useExpandState(data);
+  const {
+    isExpanded,
+    toggle,
+    expandAll,
+    collapseAll,
+    expandToDepth,
+    applyAutoExpand,
+  } = useExpandState(data);
+  const { query, updateQuery, matchPaths, autoExpandPaths, matchCount } =
+    useSearch(data);
   const [selectedPath, setSelectedPath] = useState(null);
+
+  // 검색 결과가 바뀌면 자동 펼침 적용
+  useEffect(() => {
+    if (autoExpandPaths.size > 0) {
+      applyAutoExpand(autoExpandPaths);
+    }
+  }, [autoExpandPaths, applyAutoExpand]);
+
+  const handleSearchChange = useCallback(
+    (newQuery) => {
+      updateQuery(newQuery, data);
+    },
+    [updateQuery, data],
+  );
 
   const handleSelectPath = useCallback((path) => {
     setSelectedPath(path);
@@ -23,6 +47,13 @@ export default function TreeView({ data, onToast }) {
 
   return (
     <div className="flex flex-col h-full">
+      {/* 검색 바 */}
+      <SearchBar
+        query={query}
+        onChange={handleSearchChange}
+        matchCount={matchCount}
+      />
+
       {/* 툴바 */}
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <span className="text-sm font-semibold text-slate-400 mr-auto">
@@ -78,6 +109,8 @@ export default function TreeView({ data, onToast }) {
           onToggle={toggle}
           onSelectPath={handleSelectPath}
           selectedPath={selectedPath}
+          searchQuery={query}
+          matchPaths={matchPaths}
         />
       </div>
     </div>
