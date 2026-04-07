@@ -1,9 +1,23 @@
+import { useState, useCallback } from "react";
 import TreeNode from "./TreeNode";
+import PathBar from "./PathBar";
 import { useExpandState } from "../hooks/useExpandState";
 
-export default function TreeView({ data }) {
+export default function TreeView({ data, onToast }) {
   const { isExpanded, toggle, expandAll, collapseAll, expandToDepth } =
     useExpandState(data);
+  const [selectedPath, setSelectedPath] = useState(null);
+
+  const handleSelectPath = useCallback((path) => {
+    setSelectedPath(path);
+  }, []);
+
+  const handleCopy = useCallback(
+    (message) => {
+      onToast?.(message);
+    },
+    [onToast],
+  );
 
   if (data === null || data === undefined) return null;
 
@@ -15,7 +29,6 @@ export default function TreeView({ data }) {
           🌳 Tree View
         </span>
 
-        {/* 깊이별 펼침 */}
         <div className="flex items-center gap-1">
           <span className="text-[10px] text-slate-600 mr-1">깊이:</span>
           {[1, 2, 3, 4].map((d) => (
@@ -48,6 +61,9 @@ export default function TreeView({ data }) {
         </button>
       </div>
 
+      {/* JSONPath 바 */}
+      <PathBar path={selectedPath} onCopy={handleCopy} />
+
       {/* 트리 렌더링 영역 */}
       <div
         className="flex-1 min-h-0 overflow-auto custom-scrollbar rounded-lg
@@ -60,6 +76,8 @@ export default function TreeView({ data }) {
           path="$"
           isExpanded={isExpanded}
           onToggle={toggle}
+          onSelectPath={handleSelectPath}
+          selectedPath={selectedPath}
         />
       </div>
     </div>

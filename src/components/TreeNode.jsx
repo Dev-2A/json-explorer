@@ -1,9 +1,4 @@
-import {
-  getValueType,
-  isExpandable,
-  getPreview,
-  getTypeColorClass,
-} from "../utils/typeUtils";
+import { getValueType, isExpandable, getPreview } from "../utils/typeUtils";
 import ValueRenderer from "./ValueRenderer";
 
 export default function TreeNode({
@@ -14,18 +9,25 @@ export default function TreeNode({
   path = "$",
   isExpanded,
   onToggle,
+  onSelectPath,
+  selectedPath,
 }) {
   const type = getValueType(value);
   const expandable = isExpandable(value);
   const expanded = isExpanded(path);
+  const isSelected = selectedPath === path;
 
   const indent = depth * 20;
 
-  const handleToggle = () => {
+  const handleToggle = (e) => {
+    e.stopPropagation();
     if (expandable) onToggle(path);
   };
 
-  // 자식 엔트리 추출
+  const handleSelect = () => {
+    onSelectPath?.(path);
+  };
+
   const getEntries = () => {
     if (type === "array") {
       return value.map((item, index) => ({
@@ -51,7 +53,6 @@ export default function TreeNode({
   const closeBracket = type === "array" ? "]" : "}";
   const comma = isLast ? "" : ",";
 
-  // 타입 뱃지
   const typeBadge = (
     <span
       className={`ml-2 text-[10px] px-1.5 py-0 rounded-full opacity-0 
@@ -71,20 +72,15 @@ export default function TreeNode({
     <div className="font-mono text-sm leading-6 select-none">
       {/* 현재 노드 행 */}
       <div
-        className="flex items-center hover:bg-slate-800/50 rounded px-1 group"
+        onClick={handleSelect}
+        className={`flex items-center rounded px-1 group cursor-pointer
+                   ${
+                     isSelected
+                       ? "bg-blue-900/30 border-l-2 border-blue-400"
+                       : "hover:bg-slate-800/50"
+                   }`}
         style={{ paddingLeft: `${indent}px` }}
       >
-        {/* 인덴트 가이드 라인 */}
-        {depth > 0 && (
-          <div
-            className="absolute border-l border-slate-800"
-            style={{
-              left: `${indent - 10}px`,
-              height: "100%",
-            }}
-          />
-        )}
-
         {/* 펼침/접기 화살표 */}
         <span
           onClick={handleToggle}
@@ -149,10 +145,11 @@ export default function TreeNode({
               path={entry.path}
               isExpanded={isExpanded}
               onToggle={onToggle}
+              onSelectPath={onSelectPath}
+              selectedPath={selectedPath}
             />
           ))}
 
-          {/* 닫는 괄호 */}
           <div
             className="flex items-center px-1"
             style={{ paddingLeft: `${indent}px` }}
