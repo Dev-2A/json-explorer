@@ -1,10 +1,11 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import TreeNode from "./TreeNode";
 import PathBar from "./PathBar";
 import SearchBar from "./SearchBar";
 import StatsPanel from "./StatsPanel";
 import { useExpandState } from "../hooks/useExpandState";
 import { useSearch } from "../hooks/useSearch";
+import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 
 export default function TreeView({ data, rawText, onToast }) {
   const {
@@ -19,6 +20,14 @@ export default function TreeView({ data, rawText, onToast }) {
     useSearch(data);
   const [selectedPath, setSelectedPath] = useState(null);
   const [showStats, setShowStats] = useState(false);
+  const searchRef = useRef(null);
+
+  // 키보드 단축키
+  useKeyboardShortcuts({
+    expandAll,
+    collapseAll,
+    focusSearch: () => searchRef.current?.focus(),
+  });
 
   useEffect(() => {
     if (autoExpandPaths.size > 0) {
@@ -50,6 +59,7 @@ export default function TreeView({ data, rawText, onToast }) {
     <div className="flex flex-col h-full">
       {/* 검색 바 */}
       <SearchBar
+        ref={searchRef}
         query={query}
         onChange={handleSearchChange}
         matchCount={matchCount}
@@ -79,6 +89,7 @@ export default function TreeView({ data, rawText, onToast }) {
 
         <button
           onClick={expandAll}
+          title="전체 펼치기 (Ctrl+Shift+E)"
           className="px-2 py-1 text-xs rounded bg-slate-800 text-slate-300
                      hover:bg-slate-700 transition-colors cursor-pointer"
         >
@@ -86,6 +97,7 @@ export default function TreeView({ data, rawText, onToast }) {
         </button>
         <button
           onClick={collapseAll}
+          title="전체 접기 (Ctrl+Shift+W)"
           className="px-2 py-1 text-xs rounded bg-slate-800 text-slate-300
                      hover:bg-slate-700 transition-colors cursor-pointer"
         >
@@ -96,6 +108,7 @@ export default function TreeView({ data, rawText, onToast }) {
 
         <button
           onClick={() => setShowStats((prev) => !prev)}
+          title="통계 패널 토글"
           className={`px-2 py-1 text-xs rounded transition-colors cursor-pointer
                      ${
                        showStats
@@ -107,7 +120,7 @@ export default function TreeView({ data, rawText, onToast }) {
         </button>
       </div>
 
-      {/* 통계 패널 (토글) */}
+      {/* 통계 패널 */}
       {showStats && (
         <div className="mb-3">
           <StatsPanel data={data} rawText={rawText} />
@@ -135,6 +148,34 @@ export default function TreeView({ data, rawText, onToast }) {
           matchPaths={matchPaths}
           onToast={onToast}
         />
+      </div>
+
+      {/* 하단 단축키 힌트 */}
+      <div className="mt-2 flex items-center gap-4 text-[10px] text-slate-600">
+        <span>
+          <kbd className="px-1 py-0.5 rounded bg-slate-800 text-slate-500">
+            Ctrl+Shift+F
+          </kbd>{" "}
+          검색
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded bg-slate-800 text-slate-500">
+            Ctrl+Shift+E
+          </kbd>{" "}
+          전체 펼침
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded bg-slate-800 text-slate-500">
+            Ctrl+Shift+D
+          </kbd>{" "}
+          전체 접기
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded bg-slate-800 text-slate-500">
+            우클릭
+          </kbd>{" "}
+          값 복사
+        </span>
       </div>
     </div>
   );

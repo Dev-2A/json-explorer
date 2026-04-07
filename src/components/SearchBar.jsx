@@ -1,17 +1,22 @@
-export default function SearchBar({ query, onChange, matchCount }) {
+import { forwardRef } from "react";
+
+const SearchBar = forwardRef(function SearchBar(
+  { query, onChange, matchCount },
+  ref,
+) {
   return (
     <div className="flex items-center gap-2 mb-3">
       <div className="relative flex-1">
-        {/* 검색 아이콘 */}
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none">
           🔎
         </span>
 
         <input
+          ref={ref}
           type="text"
           value={query}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="키 또는 값 검색..."
+          placeholder="키 또는 값 검색... (Ctrl+Shift+F)"
           spellCheck={false}
           className="w-full pl-8 pr-16 py-1.5 text-xs font-mono rounded-lg
                      bg-slate-800 border border-slate-700 text-slate-200
@@ -19,7 +24,6 @@ export default function SearchBar({ query, onChange, matchCount }) {
                      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
 
-        {/* 매칭 카운트 */}
         {query && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-500">
             {matchCount > 0 ? (
@@ -31,7 +35,6 @@ export default function SearchBar({ query, onChange, matchCount }) {
         )}
       </div>
 
-      {/* 지우기 버튼 */}
       {query && (
         <button
           onClick={() => onChange("")}
@@ -43,4 +46,6 @@ export default function SearchBar({ query, onChange, matchCount }) {
       )}
     </div>
   );
-}
+});
+
+export default SearchBar;
