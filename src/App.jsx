@@ -41,7 +41,7 @@ function App() {
       <main className="flex flex-1 min-h-0">
         {/* 좌측: 입력 패널 */}
         <div className="w-1/2 border-r border-slate-800 p-4 flex flex-col">
-          <InputPanel onParse={parse} />
+          <InputPanel onParse={parse} onToast={handleToast} />
         </div>
 
         {/* 우측: 트리 뷰 */}
@@ -60,7 +60,7 @@ function App() {
         </div>
       </main>
 
-      {/* 복사 토스트 */}
+      {/* 토스트 */}
       <CopyToast
         message={toast.message}
         visible={toast.visible}

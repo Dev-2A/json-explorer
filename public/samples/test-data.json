@@ -1,0 +1,47 @@
+{
+  "user": {
+    "id": 1,
+    "name": "홍길동",
+    "email": "hong@example.com",
+    "isActive": true,
+    "age": 28,
+    "address": {
+      "city": "서울",
+      "district": "강남구",
+      "zipCode": "06000"
+    },
+    "skills": ["Python", "React", "Docker"],
+    "scores": [95, 87, 100, 72],
+    "metadata": null
+  },
+  "posts": [
+    {
+      "id": 101,
+      "title": "첫 번째 글",
+      "published": true,
+      "tags": ["dev", "tutorial"],
+      "comments": [
+        { "author": "김철수", "text": "좋은 글이네요!" },
+        { "author": "이영희", "text": "감사합니다" }
+      ]
+    },
+    {
+      "id": 102,
+      "title": "두 번째 글",
+      "published": false,
+      "tags": [],
+      "comments": []
+    }
+  ],
+  "config": {
+    "theme": "dark",
+    "language": "ko",
+    "notifications": {
+      "email": true,
+      "sms": false,
+      "push": true
+    },
+    "maxRetries": 3,
+    "timeout": 5000
+  }
+}
