@@ -1,6 +1,8 @@
+import { useState, useCallback } from "react";
 import { getValueType, isExpandable, getPreview } from "../utils/typeUtils";
 import ValueRenderer from "./ValueRenderer";
 import HighlightText from "./HighlightText";
+import NodeContextMenu from "./NodeContextMenu";
 
 export default function TreeNode({
   name,
@@ -14,12 +16,14 @@ export default function TreeNode({
   selectedPath,
   searchQuery = "",
   matchPaths = new Set(),
+  onToast,
 }) {
   const type = getValueType(value);
   const expandable = isExpandable(value);
   const expanded = isExpanded(path);
   const isSelected = selectedPath === path;
   const isMatch = matchPaths.has(path);
+  const [contextMenu, setContextMenu] = useState(null);
 
   const indent = depth * 20;
 
@@ -31,6 +35,12 @@ export default function TreeNode({
   const handleSelect = () => {
     onSelectPath?.(path);
   };
+
+  const handleContextMenu = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY });
+  }, []);
 
   const getEntries = () => {
     if (type === "array") {
@@ -72,7 +82,6 @@ export default function TreeNode({
     </span>
   );
 
-  // 매칭 행 좌측 표시
   const matchIndicator = isMatch ? (
     <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-yellow-400 rounded-full" />
   ) : null;
@@ -82,6 +91,7 @@ export default function TreeNode({
       {/* 현재 노드 행 */}
       <div
         onClick={handleSelect}
+        onContextMenu={handleContextMenu}
         className={`relative flex items-center rounded px-1 group cursor-pointer
                    ${
                      isSelected
@@ -94,7 +104,6 @@ export default function TreeNode({
       >
         {matchIndicator}
 
-        {/* 펼침/접기 화살표 */}
         <span
           onClick={handleToggle}
           className={`w-4 h-4 flex items-center justify-center text-[10px] shrink-0
@@ -108,7 +117,6 @@ export default function TreeNode({
           {expandable ? "▼" : ""}
         </span>
 
-        {/* 키 이름 */}
         {name !== undefined && name !== null && (
           <>
             <span className="text-json-key">
@@ -125,7 +133,6 @@ export default function TreeNode({
           </>
         )}
 
-        {/* 값 or 여는 괄호 */}
         {expandable ? (
           <>
             <span className="text-json-bracket">{openBracket}</span>
@@ -152,7 +159,7 @@ export default function TreeNode({
         )}
       </div>
 
-      {/* 자식 노드 (재귀) */}
+      {/* 자식 노드 */}
       {expandable && expanded && (
         <>
           {entries.map((entry, index) => (
@@ -169,6 +176,7 @@ export default function TreeNode({
               selectedPath={selectedPath}
               searchQuery={searchQuery}
               matchPaths={matchPaths}
+              onToast={onToast}
             />
           ))}
 
@@ -181,6 +189,18 @@ export default function TreeNode({
             <span className="text-slate-500">{comma}</span>
           </div>
         </>
+      )}
+
+      {/* 컨텍스트 메뉴 */}
+      {contextMenu && (
+        <NodeContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          value={value}
+          path={path}
+          onCopy={(msg) => onToast?.(msg)}
+          onClose={() => setContextMenu(null)}
+        />
       )}
     </div>
   );

@@ -2,10 +2,11 @@ import { useState, useCallback, useEffect } from "react";
 import TreeNode from "./TreeNode";
 import PathBar from "./PathBar";
 import SearchBar from "./SearchBar";
+import StatsPanel from "./StatsPanel";
 import { useExpandState } from "../hooks/useExpandState";
 import { useSearch } from "../hooks/useSearch";
 
-export default function TreeView({ data, onToast }) {
+export default function TreeView({ data, rawText, onToast }) {
   const {
     isExpanded,
     toggle,
@@ -17,8 +18,8 @@ export default function TreeView({ data, onToast }) {
   const { query, updateQuery, matchPaths, autoExpandPaths, matchCount } =
     useSearch(data);
   const [selectedPath, setSelectedPath] = useState(null);
+  const [showStats, setShowStats] = useState(false);
 
-  // 검색 결과가 바뀌면 자동 펼침 적용
   useEffect(() => {
     if (autoExpandPaths.size > 0) {
       applyAutoExpand(autoExpandPaths);
@@ -90,7 +91,28 @@ export default function TreeView({ data, onToast }) {
         >
           전체 접기
         </button>
+
+        <div className="w-px h-4 bg-slate-700" />
+
+        <button
+          onClick={() => setShowStats((prev) => !prev)}
+          className={`px-2 py-1 text-xs rounded transition-colors cursor-pointer
+                     ${
+                       showStats
+                         ? "bg-blue-600 text-white"
+                         : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                     }`}
+        >
+          📊
+        </button>
       </div>
+
+      {/* 통계 패널 (토글) */}
+      {showStats && (
+        <div className="mb-3">
+          <StatsPanel data={data} rawText={rawText} />
+        </div>
+      )}
 
       {/* JSONPath 바 */}
       <PathBar path={selectedPath} onCopy={handleCopy} />
@@ -111,6 +133,7 @@ export default function TreeView({ data, onToast }) {
           selectedPath={selectedPath}
           searchQuery={query}
           matchPaths={matchPaths}
+          onToast={onToast}
         />
       </div>
     </div>

@@ -8,6 +8,15 @@ import { useJsonParser } from "./hooks/useJsonParser";
 function App() {
   const { parsedData, error, parse } = useJsonParser();
   const [toast, setToast] = useState({ visible: false, message: "" });
+  const [rawText, setRawText] = useState("");
+
+  const handleParse = useCallback(
+    (text) => {
+      setRawText(text);
+      parse(text);
+    },
+    [parse],
+  );
 
   const handleToast = useCallback((message) => {
     setToast({ visible: true, message });
@@ -41,13 +50,17 @@ function App() {
       <main className="flex flex-1 min-h-0">
         {/* 좌측: 입력 패널 */}
         <div className="w-1/2 border-r border-slate-800 p-4 flex flex-col">
-          <InputPanel onParse={parse} onToast={handleToast} />
+          <InputPanel onParse={handleParse} onToast={handleToast} />
         </div>
 
         {/* 우측: 트리 뷰 */}
         <div className="w-1/2 p-4 flex flex-col">
           {parsedData ? (
-            <TreeView data={parsedData} onToast={handleToast} />
+            <TreeView
+              data={parsedData}
+              rawText={rawText}
+              onToast={handleToast}
+            />
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <p className="text-slate-600 text-sm text-center leading-relaxed">
